@@ -1,0 +1,88 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "name": {
+            "type": "string",
+            "defaultValue": "[uniqueString(resourceGroup().id, deployment().name)]"
+        },
+        "locationName": {
+            "type": "string",
+            "defaultValue": "North Central US"
+        },
+        "location": {
+            "type": "string",
+            "defaultValue": "[toLower(replace(parameters('locationName'),' ',''))]"
+        },
+        "defaultExperience": {
+            "type": "string",
+            "defaultValue": "Azure Table"
+        },
+        "isZoneRedundant": {
+            "type": "string",
+            "defaultValue": "false"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "apiVersion": "2022-08-15-preview",
+            "kind": "GlobalDocumentDB",
+            "type": "Microsoft.DocumentDb/databaseAccounts",
+            "name": "[parameters('name')]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "databaseAccountOfferType": "Standard",
+                "locations": [
+                    {
+                        "id": "[concat(parameters('name'), '-', parameters('location'))]",
+                        "failoverPriority": 0,
+                        "locationName": "[parameters('locationName')]"
+                    }
+                ],
+                "backupPolicy": {
+                    "type": "Periodic",
+                    "periodicModeProperties": {
+                        "backupIntervalInMinutes": 240,
+                        "backupRetentionIntervalInHours": 8,
+                        "backupStorageRedundancy": "Geo"
+                    }
+                },
+                "isVirtualNetworkFilterEnabled": false,
+                "virtualNetworkRules": [],
+                "ipRules": [],
+                "dependsOn": [],
+                "capabilities": [
+                    {
+                        "name": "EnableTable"
+                    },
+                    {
+                        "name": "EnableServerless"
+                    }
+                ],
+                "enableFreeTier": false,
+                "capacity": {
+                    "totalThroughputLimit": 4000
+                }
+            },
+            "tags": {
+                "defaultExperience": "[parameters('defaultExperience')]",
+                "hidden-cosmos-mmspecial": ""
+            }
+        }
+    ],
+    "outputs": {
+        "db_name": {
+          "type": "string",
+          "value": "[parameters('name')]"
+        },
+        "db_id": {
+          "type": "string",
+          "value": "[resourceId('Microsoft.DocumentDb/databaseAccounts', parameters('name'))]"
+        },
+        "db_identity": {
+          "type": "string",
+          "value": "[reference(resourceId('Microsoft.DocumentDb/databaseAccounts', parameters('name')), '2022-08-15-preview', 'full').identity.principalId]"
+        }
+      }
+    }
