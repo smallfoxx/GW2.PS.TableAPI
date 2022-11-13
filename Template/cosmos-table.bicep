@@ -49,4 +49,3 @@ resource cosmos_table 'Microsoft.DocumentDb/databaseAccounts@2022-08-15-preview'
 
 output db_name string = cosmos_table.name
 output db_id string = cosmos_table.id
-output db_identity string = cosmos_table.identity.principalId

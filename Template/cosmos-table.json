@@ -79,10 +79,6 @@
         "db_id": {
           "type": "string",
           "value": "[resourceId('Microsoft.DocumentDb/databaseAccounts', parameters('name'))]"
-        },
-        "db_identity": {
-          "type": "string",
-          "value": "[reference(resourceId('Microsoft.DocumentDb/databaseAccounts', parameters('name')), '2022-08-15-preview', 'full').identity.principalId]"
         }
       }
     }
